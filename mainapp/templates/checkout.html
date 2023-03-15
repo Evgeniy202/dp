@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container text-light">
+    <h3 class="text-center mt-5 mb-5">Оформлення замовлення</h3>
+    <table class="table">
+        <thead>
+            <tr class="text-light">
+                <th scope="col">Назва</th>
+                <th scope="col">Зображення</th>
+                <th scope="col">Ціна</th>
+                <th scope="col">Кількість</th>
+                <th scope="col">Загальна ціна</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cart.products.all %}
+            <tr class="text-light">
+                <th scope="row"><a href="{{ item.product.get_absolute_url }}">{{ item.product.title }}</a></th>
+                <td class="w-25 image_in_order"><a href="{{ item.product.get_absolute_url }}"><img
+                            src="{{ item.product.image.url }}" class="img-fluid" style="padding-right: 5%;"></a></td>
+                <td>{{ item.product.price }} грн.</td>
+                <td>{{ item.qty }}</td>
+                <td>{{ item.final_price }} грн.</td>
+            </tr>
+            {% endfor %}
+            <tr class="text-light">
+                <td colspan="2"></td>
+                <td>Всього:</td>
+                <td>{{ cart.total_products }}</td>
+                <td><strong>{{ cart.final_price }} грн.</strong></td>
+            </tr>
+        </tbody>
+    </table>
+    <hr>
+    <h3 class="text-center mt-5 mb-5">Форма замовлення</h3>
+    <form action="{% url 'make_order' %}" method="POST">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <input type="submit" class="btn btn-success btn-block mb-3" values="Оформити замовлення">
+    </form>
+</div>
+{% endblock content %}

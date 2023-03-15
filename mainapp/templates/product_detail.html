@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+    {% if messages %}
+        {% for message in messages %}
+            <div id="message" class="alert alert-success alert-dismissible fade show" role="alert">
+                <strong>{{ message }}</strong>
+                <script>
+                    setTimeout(function () {
+                        document.getElementById('message').style.display = 'none';
+                    }, 4000);
+                    document.getElementById('message').onclick = function () {
+                        document.getElementById('message').hidden = true;
+                    }
+                </script>
+            </div>
+            {% block productfilter %}
+            {% endblock productfilter %}
+        {% endfor %}
+    {% endif %}
+    <div class="container text-light">
+        <nav aria-label="breadcrumb" class="mt-5">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'index' %}">Головна</a></li>
+                <li class="breadcrumb-item"><a
+                        href="{{ product.category.get_absolute_url }}">{{ product.category.name }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ product.title }}</li>
+            </ol>
+        </nav>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="main-img-slider">
+                    <a data-fancybox="gallery" href="{{ product.image.url }}"><img src="{{ product.image.url }}"
+                                                                                   class="img-fluid" style="min-width: 100%;">Переглянути більше
+                        зображень</a>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h3>{{ product.title }}</h3>
+                <p>Ціна: {{ product.price }} грн.</p>
+                <p>Опис: {{ product.description }}</p>
+                <hr>
+                {% if request.user.is_authenticated %}
+                    <a href="{% url 'add_to_cart' slug=product.slug %}">
+                        <button class="btn btn-danger">Додати до кошику</button>
+                    </a>
+                {% endif %}
+                {% if not request.user.is_authenticated %}
+                    <a href="{% url 'registration' %}">
+                        <button class="btn btn-danger">Додати до кошику</button>
+                    </a>
+                {% endif %}
+            </div>
+            <hr>
+            <p class="mt-4"><h4>Характеристики:</h4></p>
+            <table class="table">
+                <tbody>
+                {% for f_name, f_value in product.get_features.items %}
+                    <tr class="text-light">
+                        <th scope="row">{{ f_name }}</th>
+                        <td>{{ f_value }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <hr>
+            <p class="mt-4"><h4>Коментарі:</h4></p>
+            <div class="text-light">
+                <div class="col-md-12">
+                    <h3 class=""></h3>
+                    <form action="" method="POST">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <input type="submit" class="btn btn-success btn-block" value="Додати">
+                    </form>
+                </div>
+            </div>
+            {% for comment in comments %}
+                {% if comment.product == product.title %}
+                    <div class="comment mt-4 text-justify float-left">
+                        <hr style="margin-right: 60%;">
+                        <h6>{{ comment.name }} <span>- {{ comment.created_at }}</span></h6>
+                        <br>
+                        <h6>{{ comment.generalDescription }}</h6>
+                        <p>{{ comment.comment }}</p>
+                        <hr style="margin-right: 60%;">
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <div class="row">
+            <section id="detail">
+                <div class="main-img-slider">
+                    {% if product.img1 %}
+                        <a data-fancybox="gallery" href="{{ product.img1.url }}"><img src="{{ product.img1.url }}"
+                                                                                      class="img-fluid"
+                                                                                      style="display: none;"></a>
+                    {% endif %}
+                    {% if product.img2 %}
+                        <a data-fancybox="gallery" href="{{ product.img2.url }}"><img src="{{ product.img2.url }}"
+                                                                                      class="img-fluid"
+                                                                                      style="display: none;"></a>
+                    {% endif %}
+                    {% if product.img3 %}
+                        <a data-fancybox="gallery" href="{{ product.img3.url }}"><img src="{{ product.img3.url }}"
+                                                                                      class="img-fluid"
+                                                                                      style="display: none;"></a>
+                    {% endif %}
+                    {% if product.img4 %}
+                        <a data-fancybox="gallery" href="{{ product.img4.url }}"><img src="{{ product.img4.url }}"
+                                                                                      class="img-fluid"
+                                                                                      style="display: none;"></a>
+                    {% endif %}
+                    {% if product.img5 %}
+                        <a data-fancybox="gallery" href="{{ product.img5.url }}"><img src="{{ product.img5.url }}"
+                                                                                      class="img-fluid"
+                                                                                      style="display: none;"></a>
+                    {% endif %}
+                    {% if product.img6 %}
+                        <a data-fancybox="gallery" href="{{ product.img6.url }}"><img src="{{ product.img6.url }}"
+                                                                                      class="img-fluid"
+                                                                                      style="display: none;"></a>
+                    {% endif %}
+                    {% if product.img7 %}
+                        <a data-fancybox="gallery" href="{{ product.img7.url }}"><img src="{{ product.img7.url }}"
+                                                                                      class="img-fluid"
+                                                                                      style="display: none;"></a>
+                    {% endif %}
+                    {% if product.img8 %}
+                        <a data-fancybox="gallery" href="{{ product.img8.url }}"><img src="{{ product.img8.url }}"
+                                                                                      class="img-fluid"
+                                                                                      style="display: none;"></a>
+                    {% endif %}
+                </div>
+            </section>
+            <script>
+                $('#detail .main-img-slider').slick({
+                    slidesToShow: 1,
+                    slidesToScroll: 1,
+                    infinite: true,
+                    arrows: true,
+                    fade: true,
+                    autoplay: true,
+                    autoplaySpeed: 4000,
+                    speed: 300,
+                    lazyLoad: 'ondemand',
+                    asNavFor: '.thumb-nav',
+                    prevArrow: '<div class="slick-prev"><i class="i-prev"></i><span class="sr-only sr-only-focusable">Previous</span></div>',
+                    nextArrow: '<div class="slick-next"><i class="i-next"></i><span class="sr-only sr-only-focusable">Next</span></div>'
+                });
+            </script>
+            <script>
+                $('.thumb-nav').slick({
+                    slidesToShow: 4,
+                    slidesToScroll: 1,
+                    infinite: true,
+                    centerPadding: '0px',
+                    asNavFor: '.main-img-slider',
+                    dots: false,
+                    centerMode: false,
+                    draggable: true,
+                    speed: 200,
+                    focusOnSelect: true,
+                    prevArrow: '<div class="slick-prev"><i class="i-prev"></i><span class="sr-only sr-only-focusable">Previous</span></div>',
+                    nextArrow: '<div class="slick-next"><i class="i-next"></i><span class="sr-only sr-only-focusable">Next</span></div>'
+                });
+            </script>
+            <script>
+                $('.main-img-slider').on('afterChange', function (event, slick, currentSlide, nextSlide) {
+                    //remove all active class
+                    $('.thumb-nav .slick-slide').removeClass('slick-current');
+                    //set active class for current slide
+                    $('.thumb-nav .slick-slide:not(.slick-cloned)').eq(currentSlide).addClass('slick-current');
+                });
+            </script>
+        </div>
+    </div>
+{% endblock content %}

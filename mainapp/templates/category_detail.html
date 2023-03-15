@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load search_filter %}
+
+{% block content %}
+    <div class="container text-light">
+        {% block productfilter %}
+            <form class="d-flex mt-3" action="{% url 'category_detail' slug=category.slug %}" method="GET">
+                <input class="form-control me-2" name="search" type="search" placeholder="Поиск товара"
+                       aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">Пошук</button>
+            </form>
+            <hr>
+            <nav aria-label="breadcrumb" class="mt-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'index' %}">Головна</a></li>
+                    <li class="breadcrumb-item active"><a href="#">{{ category.name }}</a></li>
+                </ol>
+            </nav>
+            <div class="row">
+                <button id="dropBtn" class="btn btn-outline-success">Фільтр</button>
+                <div id="filter" style="display:none;">
+                    <form action="{% url 'category_detail' slug=category.slug %}" method="GET">
+                        {{ category|product_spec }}
+                        <p class="text-center">
+                            <button class="btn btn-outline-success" type="submit">Пошук</button>
+                            <button class="btn btn-outline-info" type="submit">Скинути фільтр (Показати все)</button>
+                        </p>
+                    </form>
+                </div>
+            </div>
+            <script>
+                let filter = document.getElementById("filter")
+                let dropBtn = document.getElementById("dropBtn")
+
+                dropBtn.addEventListener("click", () => {
+                    if (filter.style.display == "block") {
+                        filter.style.display = "none";
+                    } else if (filter.style.display == "none") {
+                        filter.style.display = "block";
+                    }
+
+                })
+            </script>
+        {% endblock productfilter %}
+        <section class="py-5">
+            <div class="container px-4 px-lg-5 mt-5">
+                <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+
+                    {% for product in category_products %}
+                        {% if product.active %}
+                            <div class="col mb-5">
+                                <div class="card h-100">
+                                    <!-- Product image-->
+                                    <a href="{{ product.get_absolute_url }}">
+                                        <img class="card-img-top img_card image_cart" src="{{ product.image.url }}"
+                                             alt="..."/>
+                                    </a>
+                                    <!-- Product details-->
+                                    <div class="card-body p-4 row align-items-end text-dark">
+                                        <div class="text-center">
+                                            <!-- Product name-->
+                                            <a href="{{ product.get_absolute_url }}">
+                                                <h6>{{ product.title }}</h6>
+                                            </a>
+                                            <!-- Product price-->
+                                            {{ product.price }} грн
+                                            <br>
+                                            {% if request.user.is_authenticated %}
+                                                <a class="btn btn-outline-dark mt-auto"
+                                                    href="{% url 'add_to_cart'  slug=product.slug %}">Додати до кошика</a>
+                                            {% endif %}
+                                            {% if not request.user.is_authenticated %}
+                                               <a class="btn btn-outline-dark mt-auto"
+                                               href="{% url 'registration' %}">Додати до кошика</a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    </div>
+{% endblock content %}

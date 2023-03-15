@@ -1,0 +1,234 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
+    <title>{% block title %}{% endblock %}</title>
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href='{% static "bootstrap/bootstrap.min.css" %}' rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@4.0/dist/fancybox.css"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.2/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.3.5/jquery.fancybox.min.css" rel="stylesheet"/>
+    <style type="text/css">
+        body {
+            background-color: #242424f2;
+        }
+
+        /* .img_card {
+            max-height: 250px;
+        } */
+
+        .title {
+            color: white;
+        }
+
+        .img_banner {
+            max-width: 100%;
+        }
+
+        .image_cart {
+            max-width: 50%;
+            margin-left: 25%;
+        }
+
+        .image_in_order {
+            max-width: 5%;
+        }
+    </style>
+</head>
+<body>
+<!-- Navigation-->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container px-4 px-lg-5">
+        <a href="/"><h3 class="title"><span>FishingShop</span></h3></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span
+                class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="{% url 'index' %}">
+                        Головна
+                    </a>
+                </li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">Про нас</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        Категорії
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        {% for category in categories %}
+                            <li><a class="dropdown-item" href="{{ category.get_absolute_url }}">{{ category.name }}
+                                ({{ category.product_set.count }})</a></li>
+                        {% endfor %}
+                    </ul>
+                </li>
+                {% if not request.user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Авторизація</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'registration' %}">Реєстрація</a>
+                    </li>
+                {% endif %}
+                {% if request.user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'profile' %}">Особистий кабінет</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'support' %}">Підтримка</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">Вихід</a>
+                    </li>
+                {% endif %}
+            </ul>
+            <i class="bi-cart-fill me-1"></i>
+            <a class="nav-link" href="{% url 'cart' %}">
+                Кошик
+                <span class="badge bg-dark text-white ms-1 rounded-pill">{{ cart.products.count }}</span>
+            </a>
+        </div>
+    </div>
+</nav>
+{% if messages %}
+        {% for message in messages %}
+            <div id="message" class="alert alert-success alert-dismissible fade show" role="alert">
+                <strong>{{ message }}</strong>
+                <script>
+                    setTimeout(function () {
+                        document.getElementById('message').style.display = 'none';
+                    }, 4000);
+                    document.getElementById('message').onclick = function () {
+                        document.getElementById('message').hidden = true;
+                    }
+                </script>
+            </div>
+            {% block productfilter %}
+            {% endblock productfilter %}
+        {% endfor %}
+    {% endif %}
+<!-- Section-->
+{% block content %}
+    <!-- Header-->
+    {% if banners %}
+        <header class="bg-dark py-1">
+            <div class="containery px-4 px-lg-2 my-2">
+                <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+                    <div class="carousel-inner">
+                        {% for banner in banners %}
+                            {% if banner.active %}
+                                {% if banner.first %}
+                                    {% if banner.link != null %}
+                                        <div class="carousel-item active">
+                                            <a href="{{ banner.link }}"><img class="d-block w-100"
+                                                                             src="{{ banner.image.url }}"
+                                                                             alt="{{ banner.title }}"></a>
+                                        </div>
+                                    {% endif %}
+                                    {% if banner.link == null %}
+                                        <div class="carousel-item active">
+                                            <a href="#"><img class="d-block w-100"
+                                                             src="{{ banner.image.url }}"
+                                                             alt="{{ banner.title }}"></a>
+                                        </div>
+                                    {% endif %}
+                                {% else %}
+                                    {% if banner.link != null %}
+                                        <div class="carousel-item">
+                                            <a href="{{ banner.link }}"><img class="d-block w-100"
+                                                                             src="{{ banner.image.url }}"
+                                                                             alt="{{ banner.title }}"></a>
+                                        </div>
+                                    {% endif %}
+                                    {% if banner.link == null %}
+                                        <div class="carousel-item">
+                                            <a href="#"><img class="d-block w-100"
+                                                             src="{{ banner.image.url }}"
+                                                             alt="{{ banner.title }}"></a>
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <a class="carousel-control-prev" href="#carouselExampleControls" role="button"
+                       data-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Попередня</span>
+                    </a>
+                    <a class="carousel-control-next" href="#carouselExampleControls" role="button"
+                       data-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Наступна</span>
+                    </a>
+                </div>
+
+            </div>
+        </header>
+    {% endif %}
+    <section class="py-1">
+        <div class="container px-4 px-lg-5 mt-2">
+            <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+
+                {% for product in products %}
+                    {% if product.active and product.mainView %}
+                        <div class="col mb-5">
+                            <div class="card h-100">
+                                <a href="{{ product.get_absolute_url }}">
+                                    <img class="card-img-top img_card image_cart" src="{{ product.image.url }}"
+                                         alt="..."/>
+                                </a>
+                                <div class="card-body p-4 row align-items-end">
+                                    <div class="text-center">
+                                        <a href="{{ product.get_absolute_url }}">
+                                            <h6>{{ product.title }}</h6>
+                                        </a>
+                                        {{ product.price }} грн
+                                        <br>
+                                        {% if request.user.is_authenticated %}
+                                            <a class="btn btn-outline-dark mt-auto"
+                                               href="{% url 'add_to_cart' slug=product.slug %}">Додати до кошика</a>
+                                        {% endif %}
+                                        {% if not request.user.is_authenticated %}
+                                            <a class="btn btn-outline-dark mt-auto"
+                                               href="{% url 'registration' %}">Додати до кошика</a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+
+            </div>
+        </div>
+    </section>
+{% endblock content %}
+
+<!-- Footer-->
+<footer class="py-5 bg-dark" style="margin-top: 400px;">
+    <div class="container"><p class="m-0 text-center text-white">КарасикShop</p></div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@4.0/dist/fancybox.umd.js"></script>
+<!-- Bootstrap core JS-->
+<script src="{% static "bootstrap/bootstrap.min.js" %}"></script>
+<!-- Core theme JS-->
+<script src='{% static "js/scripts.js" %}'></script>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+</body>
+</html>
+
